@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Global Chat</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f2f2f2;
+}
+#chatBox {
+  width: 100%;
+  height: 400px;
+  overflow-y: scroll;
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+input {
+  width: 80%;
+  padding: 10px;
+}
+button {
+  padding: 10px 20px;
+}
+</style>
+</head>
+<body>
+
+<h2>🌍 Global Chat</h2>
+
+<div id="chatBox"></div>
+
+<input id="msg" placeholder="Write your message...">
+<button onclick="sendMsg()">Send</button>
+
+<script type="module">
+  // Firebase imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import { getDatabase, ref, push, onChildAdded } 
+    from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+  // Firebase config (تو همینو گذاشتم)
+  const firebaseConfig = {
+    apiKey: "AIzaSyARrlKYH7K4w8FNMKlxtftjOmxwWJTI8Ys",
+    authDomain: "global-chat-ilia.firebaseapp.com",
+    projectId: "global-chat-ilia",
+    storageBucket: "global-chat-ilia.firebasestorage.app",
+    messagingSenderId: "819528866312",
+    appId: "1:819528866312:web:4844dd49b443b0559f4fbd",
+    measurementId: "G-K75KE1B8BH",
+    databaseURL: "https://global-chat-ilia-default-rtdb.firebaseio.com"
+  };
+
+  // Init
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // Send message
+  window.sendMsg = function() {
+    let text = document.getElementById("msg").value;
+    if (text.trim() === "") return;
+
+    push(ref(db, "messages/"), {
+      user: "Ilia",
+      msg: text,
+      time: Date.now()
+    });
+
+    document.getElementById("msg").value = "";
+  }
+
+  // Show messages live
+  const chatBox = document.getElementById("chatBox");
+
+  onChildAdded(ref(db, "messages/"), (snapshot) => {
+    let data = snapshot.val();
+    chatBox.innerHTML += `<p><b>${data.user}:</b> ${data.msg}</p>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+</script>
+
+</body>
+</html>
